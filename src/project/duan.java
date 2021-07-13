@@ -5,26 +5,18 @@
  */
 package project;
 
-import com.sun.xml.internal.messaging.saaj.soap.impl.ElementImpl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import modelTmp.tmpNTX;
 
 /**
  *
@@ -36,7 +28,7 @@ public class duan extends javax.swing.JFrame {
     int index = 0;
     String user = "sa";
     String pass = "123";
-    String url = "jdbc:sqlserver://localhost:1433;database=project1;";
+    String url = "jdbc:sqlserver://localhost:1433;database=project;";
     DefaultTableModel dtm;
     DefaultTableModel dtm1;
 
@@ -47,18 +39,19 @@ public class duan extends javax.swing.JFrame {
         initComponents();
         filltable();
         filltable1();
-        filltable2();
     }
 
     public void fillcontrol(int index) {
 //        student ds = sv.get(index);
         txt_macl.setText(tbl_ncl.getValueAt(index, 0).toString());
         txt_hoten.setText(tbl_ncl.getValueAt(index, 1).toString());
-        Boolean gt = Boolean.parseBoolean(tbl_ncl.getValueAt(index, 2).toString());
-        if (gt = true) {
+        String gt = tbl_ncl.getValueAt(index, 2).toString();
+        if (gt.equals("Nam")) {
             rdonam.setSelected(true);
+            rdonu.setSelected(false);
         } else {
             rdonu.setSelected(true);
+            rdonam.setSelected(false);
         }
         txt_ngaysinh.setText(tbl_ncl.getValueAt(index, 3).toString());
         txt_sdt1.setText(tbl_ncl.getValueAt(index, 4).toString());
@@ -157,33 +150,38 @@ public class duan extends javax.swing.JFrame {
         }
     }
 
-    public void filltable2() {
-        dtm1 = (DefaultTableModel) tbl_tx1.getModel();
-        dtm1.setRowCount(0);
+    public void filltable2(int index) {
+        System.out.println(index);
+        String tmp = (String) tbl_ncl.getModel().getValueAt(index, 0);
+        dtm = (DefaultTableModel) tbl_tx1.getModel();
+        dtm.setRowCount(0);
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "select * from NguoiTiepXuc";
+            String sql = "select *from NguoiTiepXuc ";;
             java.sql.Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
             cl.clear();
 
             while (rs.next()) {
-                Vector data = new Vector();
-                data.add(rs.getString("MaTiepXuc"));
-                data.add(rs.getString("MaCachLi"));
-                data.add(rs.getString("Ten"));
-                data.add(rs.getBoolean("GioiTinh") == true ? "Nam" : "Nữ");
-                data.add(rs.getString("ngsinh"));
-                data.add(rs.getString("DiaChi"));
-                data.add(rs.getString("Dien"));
-
-                // Thêm một dòng vào table model
-                dtm1.addRow(data);
-
+                String tmpString = rs.getString("MaCachLi");
+                System.out.println(tmpString);
+                System.out.println(tmp);
+                if (tmpString.equals(tmp)) {
+                    Vector data = new Vector();
+                    data.add(rs.getString("MaTiepXuc"));
+                    data.add(rs.getString("MaCachLi"));
+                    data.add(rs.getString("Ten"));
+                    data.add(rs.getBoolean("GioiTinh") == true ? "Nam" : "Nữ");
+                    data.add(rs.getString("ngsinh"));
+                    data.add(rs.getString("DiaChi"));
+                    data.add(rs.getString("Dien"));
+                    // Thêm một dòng vào table model
+                    dtm.addRow(data);
+                }
             }
-            tbl_tx1.setModel(dtm1);
-            dtm1.fireTableDataChanged();
+            tbl_tx1.setModel(dtm);
+            dtm.fireTableDataChanged();
             rs.close();
 
         } catch (Exception ex) {
@@ -1084,7 +1082,9 @@ public class duan extends javax.swing.JFrame {
     private void tbl_nclMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_nclMouseClicked
         // TODO add your handling code here:
         index = tbl_ncl.getSelectedRow();
+        System.out.println(index);
         fillcontrol(index);
+        filltable2(index);
     }//GEN-LAST:event_tbl_nclMouseClicked
 
     private void txt_dien1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_dien1ActionPerformed
@@ -1096,9 +1096,8 @@ public class duan extends javax.swing.JFrame {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "insert into NguoiCachLi(  MaCachLi ,Ten,GioiTinh,ngsinh,Sdt,DiaChi,NgayCachLi,Dien,GhiChu)) values(?,?,?,?,?,?,?,?,?)";
+            String sql = "insert into NguoiCachLi(  MaCachLi ,Ten,GioiTinh,ngsinh,Sdt,DiaChi,NgayCachLi,Dien,GhiChu) values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement st = con.prepareStatement(sql);
-
             st.setString(1, txt_macl.getText());
             st.setString(2, txt_hoten.getText());
             boolean gt;
@@ -1117,6 +1116,9 @@ public class duan extends javax.swing.JFrame {
             st.execute();
             JOptionPane.showMessageDialog(this, "Nhập thành công");
             filltable();
+            
+            
+            
         } catch (Exception ex) {
             System.out.println(ex);
             JOptionPane.showMessageDialog(this, "Nhập thất bại");
@@ -1151,8 +1153,38 @@ public class duan extends javax.swing.JFrame {
             dtm.setRowCount(0);
             JOptionPane.showMessageDialog(this, "Update thành công");
             filltable();
+            
+            //f2->f1->f0
+            sql = "Select *from nguoitiepxuc where macachli = ? ";
+            st = con.prepareStatement(sql);
+            st.setString(1, txt_macl.getText());
+            ResultSet rs = st.executeQuery();
+            List<tmpNTX> listTX = new ArrayList<>();
+            while (rs.next()) {
+                tmpNTX tX = new tmpNTX();
+                tX.setMTX(rs.getString("MaTiepXuc"));
+                tX.setDien(rs.getString("Dien"));
+                listTX.add(tX);
+            }
+            
+            for (tmpNTX dien : listTX) {
+                char tmp = dien.getDien().charAt(1);
+                int Inttmp = Integer.parseInt(String.valueOf(tmp));
+                String ntmp = "F"+(Inttmp-1);
+                dien.setDien(ntmp);
+            } 
+            
+            for (tmpNTX tmp : listTX) {
+                sql = "update nguoitiepxuc set nguoitiepxuc.dien = ? where macachli = ? and MaTiepXuc = ?";
+                st = con.prepareStatement(sql);
+                st.setString(1, tmp.getDien());
+                st.setString(2, txt_macl.getText());
+                st.setString(3, tmp.getMTX());
+                st.executeUpdate();
+            }
+            filltable2(Integer.parseInt(txt_macl.getText()));
             con.close();
-
+            
         } catch (Exception ex) {
             System.out.println(ex);
             JOptionPane.showMessageDialog(this, "Update thất bại");
