@@ -39,6 +39,7 @@ public class duan extends javax.swing.JFrame {
         initComponents();
         filltable();
         filltable1();
+        filltable2(index);
     }
 
     public void fillcontrol(int index) {
@@ -59,7 +60,7 @@ public class duan extends javax.swing.JFrame {
         txt_ngaycl.setText(tbl_ncl.getValueAt(index, 6).toString());
         txt_dien1.setText(tbl_ncl.getValueAt(index, 7).toString());
         txt_ghichu.setText(tbl_ncl.getValueAt(index, 8).toString());
-
+       
     }
 
     public void fillcontrol1(int index) {
@@ -67,11 +68,13 @@ public class duan extends javax.swing.JFrame {
         txt_matx.setText(tbl_tx.getValueAt(index, 0).toString());
         txt_macl1.setText(tbl_tx.getValueAt(index, 1).toString());
         txt_hotentx.setText(tbl_tx.getValueAt(index, 2).toString());
-        Boolean gt = Boolean.parseBoolean(tbl_tx.getValueAt(index, 3).toString());
-        if (gt = true) {
-            rdo_namtx.setSelected(true);
+        String gt = tbl_tx.getValueAt(index, 3).toString();
+        if (gt.equals("Nam")) {
+            rdonam.setSelected(true);
+            rdonu.setSelected(false);
         } else {
-            rdo_nutx.setSelected(true);
+            rdonu.setSelected(true);
+            rdonam.setSelected(false);
         }
         txt_ngaysinhtx.setText(tbl_tx.getValueAt(index, 4).toString());
 
@@ -153,8 +156,8 @@ public class duan extends javax.swing.JFrame {
     public void filltable2(int index) {
         System.out.println(index);
         String tmp = (String) tbl_ncl.getModel().getValueAt(index, 0);
-        dtm = (DefaultTableModel) tbl_tx1.getModel();
-        dtm.setRowCount(0);
+        dtm1 = (DefaultTableModel) tbl_tx1.getModel();
+        dtm1.setRowCount(0);
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
@@ -177,11 +180,11 @@ public class duan extends javax.swing.JFrame {
                     data.add(rs.getString("DiaChi"));
                     data.add(rs.getString("Dien"));
                     // Thêm một dòng vào table model
-                    dtm.addRow(data);
+                    dtm1.addRow(data);
                 }
             }
-            tbl_tx1.setModel(dtm);
-            dtm.fireTableDataChanged();
+            tbl_tx1.setModel(dtm1);
+            dtm1.fireTableDataChanged();
             rs.close();
 
         } catch (Exception ex) {
@@ -736,6 +739,11 @@ public class duan extends javax.swing.JFrame {
                 cbx_timdien1ItemStateChanged(evt);
             }
         });
+        cbx_timdien1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbx_timdien1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -1116,9 +1124,7 @@ public class duan extends javax.swing.JFrame {
             st.execute();
             JOptionPane.showMessageDialog(this, "Nhập thành công");
             filltable();
-            
-            
-            
+
         } catch (Exception ex) {
             System.out.println(ex);
             JOptionPane.showMessageDialog(this, "Nhập thất bại");
@@ -1128,67 +1134,85 @@ public class duan extends javax.swing.JFrame {
     private void btn_sua1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_sua1ActionPerformed
         // TODO add your handling code here:
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "Update NguoiCachLi set Ten =?,GioiTinh = ?,ngsinh =?,Sdt = ?,"
-                    + "DiaChi = ? ,NgayCachLi = ?,Dien = ?,GhiChu = ?"
-                    + " where  MaCachLi = ?";
-            PreparedStatement st = con.prepareStatement(sql);
-            st.setString(9, txt_macl.getText());
-            st.setString(1, txt_hoten.getText());
-            boolean gt;
-            if (rdonam.isSelected()) {
-                gt = true;
+            char tmpDien = txt_dien1.getText().charAt(1);
+            int InttmpDien = Integer.parseInt(String.valueOf(tmpDien));
+            String tmpDien1 =  (String) tbl_ncl.getModel().getValueAt(index, 7);
+            char tmpDien1Char = tmpDien1.charAt(1);
+            int InttmpDien1 = Integer.parseInt(String.valueOf(tmpDien1Char));
+            if (InttmpDien == InttmpDien1 || InttmpDien<0 ) {
+                JOptionPane.showMessageDialog(this, "Sua khong thanh cong");
             } else {
-                gt = false;
-            }
-            st.setBoolean(2, gt);
-            st.setString(3, txt_ngaysinh.getText());
-            st.setString(4, txt_sdt1.getText());
-            st.setString(5, txt_diachi.getText());
-            st.setString(6, txt_ngaycl.getText());
-            st.setString(7, txt_dien1.getText());
-            st.setString(8, txt_ghichu.getText());
-            st.executeUpdate();
-            dtm.setRowCount(0);
-            JOptionPane.showMessageDialog(this, "Update thành công");
-            filltable();
-            
-            //f2->f1->f0
-            sql = "Select *from nguoitiepxuc where macachli = ? ";
-            st = con.prepareStatement(sql);
-            st.setString(1, txt_macl.getText());
-            ResultSet rs = st.executeQuery();
-            List<tmpNTX> listTX = new ArrayList<>();
-            while (rs.next()) {
-                tmpNTX tX = new tmpNTX();
-                tX.setMTX(rs.getString("MaTiepXuc"));
-                tX.setDien(rs.getString("Dien"));
-                listTX.add(tX);
-            }
-            
-            for (tmpNTX dien : listTX) {
-                char tmp = dien.getDien().charAt(1);
-                int Inttmp = Integer.parseInt(String.valueOf(tmp));
-                String ntmp = "F"+(Inttmp-1);
-                dien.setDien(ntmp);
-            } 
-            
-            for (tmpNTX tmp : listTX) {
-                sql = "update nguoitiepxuc set nguoitiepxuc.dien = ? where macachli = ? and MaTiepXuc = ?";
-                st = con.prepareStatement(sql);
-                st.setString(1, tmp.getDien());
-                st.setString(2, txt_macl.getText());
-                st.setString(3, tmp.getMTX());
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = DriverManager.getConnection(url, user, pass);
+                String sql = "Update NguoiCachLi set Ten =?,GioiTinh = ?,ngsinh =?,Sdt = ?,"
+                        + "DiaChi = ? ,NgayCachLi = ?,Dien = ?,GhiChu = ?"
+                        + " where  MaCachLi = ?";
+                PreparedStatement st = con.prepareStatement(sql);
+                st.setString(9, txt_macl.getText());
+                st.setString(1, txt_hoten.getText());
+                boolean gt;
+                if (rdonam.isSelected()) {
+                    gt = true;
+                } else {
+                    gt = false;
+                }
+                st.setBoolean(2, gt);
+                st.setString(3, txt_ngaysinh.getText());
+                st.setString(4, txt_sdt1.getText());
+                st.setString(5, txt_diachi.getText());
+                st.setString(6, txt_ngaycl.getText());
+                st.setString(7, txt_dien1.getText());
+                st.setString(8, txt_ghichu.getText());
                 st.executeUpdate();
+                dtm.setRowCount(0);
+                JOptionPane.showMessageDialog(this, "Update thành công");
+                filltable();
+
+                //f2->f1->f0
+                sql = "Select *from nguoitiepxuc where macachli = ? ";
+                st = con.prepareStatement(sql);
+                st.setString(1, txt_macl.getText());
+                ResultSet rs = st.executeQuery();
+                List<tmpNTX> listTX = new ArrayList<>();
+                while (rs.next()) {
+                    tmpNTX tX = new tmpNTX();
+                    tX.setMTX(rs.getString("MaTiepXuc"));
+                    tX.setDien(rs.getString("Dien"));
+                    listTX.add(tX);
+                }
+
+                for (tmpNTX dien : listTX) {
+                    char tmp = dien.getDien().charAt(1);
+                    int Inttmp = Integer.parseInt(String.valueOf(tmp));
+                    if (Inttmp>0) {
+                        String ntmp = "F"+(Inttmp-1);
+                        dien.setDien(ntmp);
+                    }
+
+                } 
+
+                for (tmpNTX tmp : listTX) {
+                    sql = "update nguoitiepxuc set nguoitiepxuc.dien = ? where macachli = ? and MaTiepXuc = ?";
+                    st = con.prepareStatement(sql);
+                    st.setString(1, tmp.getDien());
+                    st.setString(2, txt_macl.getText());
+                    st.setString(3, tmp.getMTX());
+                    st.executeUpdate();
+                }
+                for(int i = 0 ; i<listTX.size();i++){
+                    listTX.remove(i);
+                }
+
+                filltable2(Integer.parseInt(txt_macl.getText()));
+                con.close();
             }
-            filltable2(Integer.parseInt(txt_macl.getText()));
-            con.close();
+           
             
         } catch (Exception ex) {
             System.out.println(ex);
-            JOptionPane.showMessageDialog(this, "Update thất bại");
         }
+        
+        filltable2(index);
     }//GEN-LAST:event_btn_sua1ActionPerformed
 
     private void btn_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_exitActionPerformed
@@ -1271,6 +1295,10 @@ public class duan extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Nhập thất bại");
         }
     }//GEN-LAST:event_btn_savetxActionPerformed
+
+    private void cbx_timdien1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_timdien1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbx_timdien1ActionPerformed
     public void locdata(String boloc) {
         TableRowSorter<DefaultTableModel> sx = new TableRowSorter<DefaultTableModel>(dtm);
         tbl_ncl.setRowSorter(sx);
@@ -1286,27 +1314,7 @@ public class duan extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(duan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(duan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(duan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(duan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+       
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -1364,9 +1372,7 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel4;
@@ -1380,8 +1386,6 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
@@ -1422,8 +1426,6 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JTextField txt_ngaysinhtx;
     private javax.swing.JTextField txt_sdt1;
     private javax.swing.JTextField txt_tim;
-    private javax.swing.JTextField txt_tim1;
-    private javax.swing.JTextField txt_tim2;
     private javax.swing.JTextField txt_tim3;
     // End of variables declaration//GEN-END:variables
 }
