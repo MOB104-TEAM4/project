@@ -5,7 +5,7 @@
  */
 package project;
 
-import java.io.FileOutputStream;
+import java.awt.Image;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
@@ -49,7 +50,7 @@ public class duan extends javax.swing.JFrame {
         initComponents();
         filltable();
         filltable1();
-        filltable2(index);
+        filltable2();
         filltable3();
         filltableNhanVien();
         getImgNhanvien();
@@ -192,8 +193,9 @@ public class duan extends javax.swing.JFrame {
         }
     }
 
-    public void filltable2(int index) {
-        String tmp = (String) tbl_ncl.getModel().getValueAt(index, 0);
+    public void filltable2() {
+        String tmp = (String) txt_macl.getText();
+        System.out.println(tmp);
         dtm2 = (DefaultTableModel) tbl_tx1.getModel();
         dtm2.setRowCount(0);
         try {
@@ -312,17 +314,8 @@ public class duan extends javax.swing.JFrame {
     public void fillImageNvien (int index) throws SQLException, IOException{
         tmpImage tmpImg = ImageNvList.get(index);
         byte [] data = tmpImg.getImg();
-        System.out.println(data);
-        try {
-            FileOutputStream fos = new FileOutputStream("tmpImg.jpg");
-            fos.write(data);
-            fos.close();
-        } catch (Exception e) {
-        }
-        
-        
-        //ImageIcon icon = new ImageIcon(img);
-       // lblImgNv.setIcon((ImageIcon)icon);
+        ImageIcon imageIcon = new ImageIcon(new ImageIcon(data).getImage().getScaledInstance(lblImgNv.getWidth(), lblImgNv.getHeight() , Image.SCALE_SMOOTH));
+        lblImgNv.setIcon(imageIcon);
     }
 
     /**
@@ -1353,7 +1346,7 @@ public class duan extends javax.swing.JFrame {
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel38)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(150, Short.MAX_VALUE))
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addComponent(txt_timNv)
@@ -1414,7 +1407,7 @@ public class duan extends javax.swing.JFrame {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel33))
@@ -1428,14 +1421,6 @@ public class duan extends javax.swing.JFrame {
                                 .addComponent(jLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txt_tenNvien, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addGap(9, 9, 9)
-                                .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_roleNvien, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblImgNv))
                             .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addGap(9, 9, 9)
                                 .addComponent(jLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1457,8 +1442,15 @@ public class duan extends javax.swing.JFrame {
                                         .addComponent(rdonuNv))
                                     .addComponent(txt_ngsinhNv, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGap(9, 9, 9)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanel7Layout.createSequentialGroup()
+                                        .addGap(12, 12, 12)
+                                        .addComponent(lblImgNv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(jPanel7Layout.createSequentialGroup()
+                                        .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txt_roleNvien, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                         .addGap(37, 37, 37)
                         .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 1383, Short.MAX_VALUE))
                     .addGroup(jPanel7Layout.createSequentialGroup()
@@ -1478,11 +1470,19 @@ public class duan extends javax.swing.JFrame {
                                 .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(185, 185, 185))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addGap(26, 26, 26)
                         .addComponent(jLabel33)
@@ -1511,24 +1511,21 @@ public class duan extends javax.swing.JFrame {
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txt_roleNvien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel40))
-                        .addGap(29, 29, 29)
-                        .addComponent(lblImgNv)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel42)
-                    .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(33, 33, 33)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblImgNv, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                        .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel42)
+                            .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_savetx1)
                     .addComponent(btnXoa4)
                     .addComponent(btnSua4)
                     .addComponent(btnExit4))
-                .addContainerGap(264, Short.MAX_VALUE))
+                .addGap(151, 151, 151))
         );
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
@@ -1644,7 +1641,7 @@ public class duan extends javax.swing.JFrame {
         // TODO add your handling code here:
         index = tbl_ncl.getSelectedRow();
         fillcontrol(index);
-        filltable2(index);
+        filltable2();
     }//GEN-LAST:event_tbl_nclMouseClicked
 
     private void txt_dien1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_dien1ActionPerformed
@@ -1755,7 +1752,7 @@ public class duan extends javax.swing.JFrame {
                     listTX.remove(i);
                 }
 
-                filltable2(Integer.parseInt(txt_macl.getText()));
+                filltable2();
                 con.close();
             }
            
@@ -1764,7 +1761,7 @@ public class duan extends javax.swing.JFrame {
             System.out.println(ex);
         }
         
-        filltable2(index);
+        filltable2();
     }//GEN-LAST:event_btn_sua1ActionPerformed
 
     private void btn_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_exitActionPerformed
@@ -1988,11 +1985,17 @@ public class duan extends javax.swing.JFrame {
 
     private void txt_timNvKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_timNvKeyReleased
         // TODO add your handling code here:
-        String tim = txt_timNv.getText();
-        TableRowSorter tb = new TableRowSorter(dtm4);
-        tbl_nhanvien.setRowSorter(tb);
-        tb.setRowFilter(RowFilter.regexFilter(tim, 0));
-        fillcontrolNhanVien(index);
+        try {
+            String tim = txt_timNv.getText();
+            TableRowSorter tb = new TableRowSorter(dtm4);
+            tbl_nhanvien.setRowSorter(tb);
+            tb.setRowFilter(RowFilter.regexFilter(tim, 0));
+            fillcontrolNhanVien(index);
+        } catch (Exception e) {
+            System.err.print(e);
+            System.err.print("Not found");
+        }
+        
     }//GEN-LAST:event_txt_timNvKeyReleased
 
     private void btn_savetx1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_savetx1ActionPerformed
