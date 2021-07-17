@@ -7,19 +7,28 @@ package project;
 
 /**
  *
- * @author Admin
+ * @author admin
  */
-public class taikhoan {
-    private String user;
-    private byte[] anh;
+public class TaiKhoan {
+    
+    
+    
+    private String user ;
+    private String pass ; 
+    private String fullname ; 
 
-    public taikhoan(String user, byte[] anh) {
+    public TaiKhoan() {
+    }
+
+    private TaiKhoan(String user, String pass, String fullname) {
         this.user = user;
-        this.anh = anh;
+        this.pass = pass;
+        this.fullname = fullname;
     }
 
-    public taikhoan() {
-    }
+    
+
+    
 
     public String getUser() {
         return user;
@@ -29,12 +38,23 @@ public class taikhoan {
         this.user = user;
     }
 
-    public byte[] getAnh() {
-        return anh;
+    public String getPass() {
+        return pass;
     }
 
-    public void setAnh(byte[] anh) {
-        this.anh = anh;
+    public void setPass(String pass) {
+        this.pass = pass;
     }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+    
+    
+    
     
 }

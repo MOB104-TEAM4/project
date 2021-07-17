@@ -18,15 +18,15 @@ import java.sql.PreparedStatement;
 public class addImgNv {
     public static void main(String[] args) {
         String user = "sa";
-        String pass = "123";
-        String url = "jdbc:sqlserver://localhost:1433;database=project;";
+        String pass = "nhom03ud16316";
+        String url = "jdbc:sqlserver://database-1.czbehjnea854.us-east-2.rds.amazonaws.com:1433;databaseName=project";
         FileInputStream fis = null;
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "Update HinhAnh set images = ? where MaUser = 'NV005' ";
+            String sql = "Update HinhAnh set images = ? where MaUser = 'NV001' ";
             PreparedStatement st = con.prepareStatement(sql);
-            File file = new File("user4.jpg");
+            File file = new File("admin.jpg");
             fis = new FileInputStream(file);
             st.setBinaryStream(1, fis, (int) file.length());
             st.executeUpdate();

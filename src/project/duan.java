@@ -6,6 +6,9 @@
 package project;
 
 import java.awt.Image;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +21,10 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -42,11 +48,14 @@ public class duan extends javax.swing.JFrame {
     DefaultTableModel dtm3;
     DefaultTableModel dtm4;
     List<tmpImage> ImageNvList = new ArrayList<>();
+    String path = null;
+    byte [] dataImg = null;
+    String username = null;
 
     /**
      * Creates new form duan
      */
-    public duan() throws ClassNotFoundException, SQLException {
+    public duan(String role, String userString) throws ClassNotFoundException, SQLException {
         initComponents();
         filltable();
         filltable1();
@@ -54,6 +63,12 @@ public class duan extends javax.swing.JFrame {
         filltable3();
         filltableNhanVien();
         getImgNhanvien();
+        if (role.equals("admin")) {
+            jPanel7.setVisible(true);
+        } else {
+            jPanel7.setVisible(false);
+        }
+        username = userString;
     }
 
     public void fillcontrol(int index) {
@@ -278,6 +293,7 @@ public class duan extends javax.swing.JFrame {
                 data.add(rs.getBoolean("GioiTinh") == true ? "Nam" : "Nữ");
                 data.add(rs.getString("sdt"));
                 data.add(rs.getString("roler"));
+                data.add(rs.getString("pass"));
                 dtm4.addRow(data);
             }
             tbl_nhanvien.setModel(dtm4);
@@ -289,9 +305,7 @@ public class duan extends javax.swing.JFrame {
         }
     }
     public void getImgNhanvien() throws ClassNotFoundException, SQLException{
-        for (tmpImage object : ImageNvList) {
-            ImageNvList.remove(object);
-        }
+        ImageNvList.clear();
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         Connection con = DriverManager.getConnection(url, user, pass);
         String sqlImg = "select * from HinhAnh";
@@ -306,9 +320,6 @@ public class duan extends javax.swing.JFrame {
             ImageNvList.add(tmp);
         }
         rsImg.close();
-        for (tmpImage object : ImageNvList) {
-            System.out.println(object.getImg());
-        }
     }
     
     public void fillImageNvien (int index) throws SQLException, IOException{
@@ -316,6 +327,24 @@ public class duan extends javax.swing.JFrame {
         byte [] data = tmpImg.getImg();
         ImageIcon imageIcon = new ImageIcon(new ImageIcon(data).getImage().getScaledInstance(lblImgNv.getWidth(), lblImgNv.getHeight() , Image.SCALE_SMOOTH));
         lblImgNv.setIcon(imageIcon);
+    }
+    
+    public void updateImg(String path) throws SQLException, IOException{
+        FileInputStream fis = null;
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection(url, user, pass);
+            String sql = "Update HinhAnh set images = ? where MaUser = ? ";
+            PreparedStatement st = con.prepareStatement(sql);
+            st.setBytes(1,dataImg);
+            st.setString(2, txt_manvien.getText());
+            st.executeUpdate();
+            con.commit();
+            con.close();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        fillImageNvien(index);
     }
 
     /**
@@ -454,7 +483,11 @@ public class duan extends javax.swing.JFrame {
         btnExit4 = new javax.swing.JButton();
         jLabel42 = new javax.swing.JLabel();
         cbx_gtNv = new javax.swing.JComboBox<>();
+        btnEditImg = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jLabel43 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -1311,7 +1344,7 @@ public class duan extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Mã nhân viên", "Họ tên", "Ngày sinh", "Giới tính", "Số điện thoại", "Quyển"
+                "Mã nhân viên", "Họ tên", "Ngày sinh", "Giới tính", "Số điện thoại", "Quyển", "Mật khẩu"
             }
         ));
         tbl_nhanvien.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1400,6 +1433,20 @@ public class duan extends javax.swing.JFrame {
             }
         });
 
+        btnEditImg.setText("choose");
+        btnEditImg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditImgActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("reset pass");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -1451,8 +1498,14 @@ public class duan extends javax.swing.JFrame {
                                         .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txt_roleNvien, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(37, 37, 37)
-                        .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 1383, Short.MAX_VALUE))
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 1383, Short.MAX_VALUE))
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnEditImg)
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1467,22 +1520,21 @@ public class duan extends javax.swing.JFrame {
                             .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addComponent(jLabel42)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(185, 185, 185))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEditImg))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addGap(26, 26, 26)
                         .addComponent(jLabel33)
@@ -1512,31 +1564,43 @@ public class duan extends javax.swing.JFrame {
                             .addComponent(txt_roleNvien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel40))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImgNv, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel42)
-                            .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addComponent(lblImgNv, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel42)
+                    .addComponent(cbx_gtNv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_savetx1)
                     .addComponent(btnXoa4)
                     .addComponent(btnSua4)
                     .addComponent(btnExit4))
-                .addGap(151, 151, 151))
+                .addGap(18, 18, 18)
+                .addComponent(jButton2)
+                .addGap(107, 107, 107))
         );
+
+        jLabel43.setText("chuc nang nay chi cho admin");
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addGap(384, 384, 384)
+                .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Quản lý nhân viên", jPanel11);
@@ -1544,22 +1608,37 @@ public class duan extends javax.swing.JFrame {
         jLabel24.setFont(new java.awt.Font("Sitka Heading", 2, 48)); // NOI18N
         jLabel24.setText("Bộ phận quản lý thông tin người nhiễm bệnh và cách ly coivd-19");
 
+        jButton1.setText("Doi pass");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTabbedPane1)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel24)
                 .addGap(184, 184, 184))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel24)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel24)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 829, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -2078,6 +2157,17 @@ public class duan extends javax.swing.JFrame {
             System.out.println(ex);
         }
         filltableNhanVien();
+        try {
+            updateImg(path);
+            getImgNhanvien();
+            fillImageNvien(index);
+        } catch (SQLException ex) {
+            Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnSua4ActionPerformed
 
     private void btnExit4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExit4ActionPerformed
@@ -2090,6 +2180,83 @@ public class duan extends javax.swing.JFrame {
         String boloc = cbx_gtNv.getSelectedItem().toString();
         locdataNv(boloc);
     }//GEN-LAST:event_cbx_gtNvItemStateChanged
+
+    private void btnEditImgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditImgActionPerformed
+        // TODO add your handling code here:
+        JFileChooser chooser = new JFileChooser();
+        chooser.showOpenDialog(null);
+        File f = chooser.getSelectedFile();
+        path = f.getAbsolutePath();
+        ImageIcon imageIcon = new ImageIcon(new ImageIcon(path).getImage().getScaledInstance(lblImgNv.getWidth(), lblImgNv.getHeight() , Image.SCALE_SMOOTH));
+        lblImgNv.setIcon(imageIcon);
+        try {
+            File file = new File(path);
+            FileInputStream fis = new FileInputStream(file);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            for(int readNum;(readNum=fis.read(buf))!=-1;){
+                bos.write(buf,0,readNum);
+            }
+            dataImg = bos.toByteArray();
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_btnEditImgActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection(url, user, pass);
+            String sql = "Update nhanvien set pass = ? where mauser =?";
+            PreparedStatement st = con.prepareStatement(sql);
+            st.setString(1, "pass123");
+            st.setString(2, txt_manvien.getText());
+            st.executeUpdate();
+            JOptionPane.showMessageDialog(this, "reset thành công");
+            filltableNhanVien();
+            con.close();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        JTextField password = new JPasswordField();
+        JTextField repass = new JPasswordField();
+        Object[] message = {
+            "Password:", password,
+            "Re-Paswrod", repass
+        };
+        int option = JOptionPane.showConfirmDialog(null, message, "Doi pass.", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            if (password.getText().equals("")) {
+                JOptionPane.showMessageDialog(this, "Điền đầy đủ thônng tin.");
+            } else if (repass.getText().equals(password.getText())){
+                try {
+                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    Connection con = DriverManager.getConnection(url, user, pass);
+                    String sql = "Update nhanvien set pass = ? where mauser =?";
+                    PreparedStatement st = con.prepareStatement(sql);
+                    st.setString(1, password.getText());
+                    st.setString(2, username);
+                    st.executeUpdate();
+                    JOptionPane.showMessageDialog(this, "Doi pass thành công.");
+                    filltableNhanVien();
+                    con.close();
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "Mật khẩu không khớp. ");
+            }
+        } else {
+            System.out.println("Login canceled");
+            System.exit(0);
+        }
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
     public void locdata(String boloc) {
         TableRowSorter<DefaultTableModel> sx = new TableRowSorter<DefaultTableModel>(dtm);
         tbl_ncl.setRowSorter(sx);
@@ -2146,7 +2313,7 @@ public class duan extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new duan().setVisible(true);
+                    new duan(null, null).setVisible(true);
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
@@ -2157,6 +2324,7 @@ public class duan extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEditImg;
     private javax.swing.JButton btnExit3;
     private javax.swing.JButton btnExit4;
     private javax.swing.JButton btnSua3;
@@ -2179,7 +2347,9 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbx_timdien;
     private javax.swing.JComboBox<String> cbx_timdien3;
     private javax.swing.JComboBox<String> cbx_timdienBenh;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton19;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -2217,6 +2387,7 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
     private javax.swing.JLabel jLabel42;
+    private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
