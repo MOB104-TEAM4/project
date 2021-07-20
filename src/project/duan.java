@@ -41,7 +41,7 @@ public class duan extends javax.swing.JFrame {
     int index = 0;
     String user = "sa";
     String pass = "123";
-    String url = "jdbc:sqlserver://localhost:1433;database=project;";
+    String url = "jdbc:sqlserver://localhost:1433;database=project1;";
     DefaultTableModel dtm;
     DefaultTableModel dtm1;
     DefaultTableModel dtm2;
@@ -58,7 +58,6 @@ public class duan extends javax.swing.JFrame {
     public duan(String role, String userString) throws ClassNotFoundException, SQLException {
         initComponents();
         filltable();
-        filltable1();
         filltable2();
         filltable3();
         filltableNhanVien();
@@ -88,30 +87,11 @@ public class duan extends javax.swing.JFrame {
         txt_diachi.setText(tbl_ncl.getValueAt(index, 5).toString());
         txt_ngaycl.setText(tbl_ncl.getValueAt(index, 6).toString());
         txt_dien1.setText(tbl_ncl.getValueAt(index, 7).toString());
-        txt_ghichu.setText(tbl_ncl.getValueAt(index, 8).toString());
+        txt_tiepxuc.setText(tbl_ncl.getValueAt(index, 8).toString());
        
     }
 
-    public void fillcontrol1(int index) {
-//        student ds = sv.get(index);
-        txt_matx.setText(tbl_tx.getValueAt(index, 0).toString());
-        txt_macl1.setText(tbl_tx.getValueAt(index, 1).toString());
-        txt_hotentx.setText(tbl_tx.getValueAt(index, 2).toString());
-        String gt = tbl_tx.getValueAt(index, 3).toString();
-        if (gt.equals("Nam")) {
-            rdo_namtx.setSelected(true);
-            rdo_nutx.setSelected(false);
-        } else {
-            rdo_nutx.setSelected(true);
-            rdo_namtx.setSelected(false);
-        }
-        txt_ngaysinhtx.setText(tbl_tx.getValueAt(index, 4).toString());
 
-        txt_diachitx.setText(tbl_tx.getValueAt(index, 5).toString());
-
-        txt_dien2.setText(tbl_tx.getValueAt(index, 6).toString());
-
-    }
     
     public void fillcontrol3(int index) {
 //        student ds = sv.get(index);
@@ -160,7 +140,7 @@ public class duan extends javax.swing.JFrame {
                 data.add(rs.getString("DiaChi"));
                 data.add(rs.getString("NgayCachLi"));
                 data.add(rs.getString("Dien"));
-                data.add(rs.getString("GhiChu"));
+                data.add(rs.getString("Tiepxuc"));
                 // Thêm một dòng vào table model
                 dtm.addRow(data);
 
@@ -174,39 +154,6 @@ public class duan extends javax.swing.JFrame {
         }
     }
 
-    public void filltable1() {
-        dtm1 = (DefaultTableModel) tbl_tx.getModel();
-        dtm1.setRowCount(0);
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "select * from NguoiTiepXuc";
-            java.sql.Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            cl.clear();
-
-            while (rs.next()) {
-                Vector data = new Vector();
-                data.add(rs.getString("MaTiepXuc"));
-                data.add(rs.getString("MaCachLi"));
-                data.add(rs.getString("Ten"));
-                data.add(rs.getBoolean("GioiTinh") == true ? "Nam" : "Nữ");
-                data.add(rs.getString("ngsinh"));
-                data.add(rs.getString("DiaChi"));
-                data.add(rs.getString("Dien"));
-
-                // Thêm một dòng vào table model
-                dtm1.addRow(data);
-
-            }
-            tbl_tx.setModel(dtm1);
-            dtm1.fireTableDataChanged();
-            rs.close();
-
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-    }
 
     public void filltable2() {
         String tmp = (String) txt_macl.getText();
@@ -216,17 +163,17 @@ public class duan extends javax.swing.JFrame {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "select *from NguoiTiepXuc ";;
+            String sql = "select *from nguoicachli ";;
             java.sql.Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
             cl.clear();
 
             while (rs.next()) {
-                String tmpString = rs.getString("MaCachLi");
+                String tmpString = rs.getString("tiepxuc");
                 if (tmpString.equals(tmp)) {
                     Vector data = new Vector();
-                    data.add(rs.getString("MaTiepXuc"));
-                    data.add(rs.getString("MaCachLi"));
+                    data.add(rs.getString("Macachli"));
+                //    data.add(rs.getString("tiepxuc"));
                     data.add(rs.getString("Ten"));
                     data.add(rs.getBoolean("GioiTinh") == true ? "Nam" : "Nữ");
                     data.add(rs.getString("ngsinh"));
@@ -308,7 +255,7 @@ public class duan extends javax.swing.JFrame {
         ImageNvList.clear();
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         Connection con = DriverManager.getConnection(url, user, pass);
-        String sqlImg = "select * from HinhAnh";
+        String sqlImg = "select * from nhanvien";
         java.sql.Statement st = con.createStatement();
         ResultSet rsImg = st.executeQuery(sqlImg);
         while (rsImg.next()) {
@@ -323,10 +270,16 @@ public class duan extends javax.swing.JFrame {
     }
     
     public void fillImageNvien (int index) throws SQLException, IOException{
-        tmpImage tmpImg = ImageNvList.get(index);
-        byte [] data = tmpImg.getImg();
-        ImageIcon imageIcon = new ImageIcon(new ImageIcon(data).getImage().getScaledInstance(lblImgNv.getWidth(), lblImgNv.getHeight() , Image.SCALE_SMOOTH));
-        lblImgNv.setIcon(imageIcon);
+        try {
+            lblImgNv.setEnabled(true);
+            tmpImage tmpImg = ImageNvList.get(index);
+            byte [] data = tmpImg.getImg();
+            ImageIcon imageIcon = new ImageIcon(new ImageIcon(data).getImage().getScaledInstance(lblImgNv.getWidth(), lblImgNv.getHeight() , Image.SCALE_SMOOTH));
+            lblImgNv.setIcon(imageIcon);
+        } catch (Exception e) {
+            lblImgNv.setEnabled(false);
+        }
+        
     }
     
     public void updateImg(String path) throws SQLException, IOException{
@@ -334,7 +287,7 @@ public class duan extends javax.swing.JFrame {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "Update HinhAnh set images = ? where MaUser = ? ";
+            String sql = "Update nhanvien set images = ? where MaUser = ? ";
             PreparedStatement st = con.prepareStatement(sql);
             st.setBytes(1,dataImg);
             st.setString(2, txt_manvien.getText());
@@ -378,8 +331,6 @@ public class duan extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         tbl_ncl = new javax.swing.JTable();
         jLabel17 = new javax.swing.JLabel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        txt_ghichu = new javax.swing.JTextArea();
         btn_them1 = new javax.swing.JButton();
         btn_xoa1 = new javax.swing.JButton();
         btn_sua1 = new javax.swing.JButton();
@@ -397,6 +348,7 @@ public class duan extends javax.swing.JFrame {
         cbx_gt = new javax.swing.JComboBox<>();
         jScrollPane9 = new javax.swing.JScrollPane();
         tbl_tx1 = new javax.swing.JTable();
+        txt_tiepxuc = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         tbl_benh = new javax.swing.JTable();
@@ -423,38 +375,6 @@ public class duan extends javax.swing.JFrame {
         jPanel10 = new javax.swing.JPanel();
         jLabel34 = new javax.swing.JLabel();
         cbx_timdienBenh = new javax.swing.JComboBox<>();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        txt_matx = new javax.swing.JTextField();
-        txt_hotentx = new javax.swing.JTextField();
-        txt_ngaysinhtx = new javax.swing.JTextField();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tbl_tx = new javax.swing.JTable();
-        btn_savetx = new javax.swing.JButton();
-        btnExit3 = new javax.swing.JButton();
-        btnSua3 = new javax.swing.JButton();
-        btnXoa3 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        rdo_namtx = new javax.swing.JRadioButton();
-        rdo_nutx = new javax.swing.JRadioButton();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        txt_macl1 = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txt_diachitx = new javax.swing.JTextArea();
-        jPanel8 = new javax.swing.JPanel();
-        jLabel31 = new javax.swing.JLabel();
-        txt_tim3 = new javax.swing.JTextField();
-        jPanel9 = new javax.swing.JPanel();
-        jLabel32 = new javax.swing.JLabel();
-        cbx_timdien3 = new javax.swing.JComboBox<>();
-        txt_dien2 = new javax.swing.JTextField();
-        jLabel29 = new javax.swing.JLabel();
-        cbx_gt3 = new javax.swing.JComboBox<>();
         jPanel11 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jLabel33 = new javax.swing.JLabel();
@@ -529,7 +449,17 @@ public class duan extends javax.swing.JFrame {
             new String [] {
                 "Mã cách ly", "Họ và tên", "Giới tính", "Ngày sinh", "Số điện thoại", "Địa chỉ", "Ngày cách ly", "Diện", "Ghi chú"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tbl_ncl.setName(""); // NOI18N
+        tbl_ncl.setRowHeight(40);
         tbl_ncl.getTableHeader().setReorderingAllowed(false);
         tbl_ncl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -537,12 +467,28 @@ public class duan extends javax.swing.JFrame {
             }
         });
         jScrollPane4.setViewportView(tbl_ncl);
+        if (tbl_ncl.getColumnModel().getColumnCount() > 0) {
+            tbl_ncl.getColumnModel().getColumn(0).setMinWidth(80);
+            tbl_ncl.getColumnModel().getColumn(0).setMaxWidth(80);
+            tbl_ncl.getColumnModel().getColumn(1).setMinWidth(150);
+            tbl_ncl.getColumnModel().getColumn(1).setMaxWidth(200);
+            tbl_ncl.getColumnModel().getColumn(2).setMinWidth(80);
+            tbl_ncl.getColumnModel().getColumn(2).setMaxWidth(80);
+            tbl_ncl.getColumnModel().getColumn(3).setMinWidth(100);
+            tbl_ncl.getColumnModel().getColumn(3).setMaxWidth(100);
+            tbl_ncl.getColumnModel().getColumn(4).setMinWidth(150);
+            tbl_ncl.getColumnModel().getColumn(4).setMaxWidth(150);
+            tbl_ncl.getColumnModel().getColumn(5).setMinWidth(300);
+            tbl_ncl.getColumnModel().getColumn(5).setMaxWidth(300);
+            tbl_ncl.getColumnModel().getColumn(6).setMinWidth(100);
+            tbl_ncl.getColumnModel().getColumn(6).setMaxWidth(100);
+            tbl_ncl.getColumnModel().getColumn(7).setMinWidth(60);
+            tbl_ncl.getColumnModel().getColumn(7).setMaxWidth(60);
+            tbl_ncl.getColumnModel().getColumn(8).setMinWidth(400);
+            tbl_ncl.getColumnModel().getColumn(8).setMaxWidth(400);
+        }
 
-        jLabel17.setText("Ghi chú");
-
-        txt_ghichu.setColumns(20);
-        txt_ghichu.setRows(5);
-        jScrollPane5.setViewportView(txt_ghichu);
+        jLabel17.setText("Tiep xuc");
 
         btn_them1.setText("Thêm");
         btn_them1.addActionListener(new java.awt.event.ActionListener() {
@@ -658,13 +604,13 @@ public class duan extends javax.swing.JFrame {
 
         tbl_tx1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Mã tiếp xúc", "Mã cách ly", "Họ tên", "Giới tính", "Ngày sinh", "Địa chỉ ", "Diện"
+                "Mã cách ly", "Họ tên", "Giới tính", "Ngày sinh", "Địa chỉ ", "Diện"
             }
         ));
         tbl_tx1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -673,6 +619,12 @@ public class duan extends javax.swing.JFrame {
             }
         });
         jScrollPane9.setViewportView(tbl_tx1);
+
+        txt_tiepxuc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_tiepxucActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -692,7 +644,7 @@ public class duan extends javax.swing.JFrame {
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                                     .addComponent(jLabel17)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(txt_tiepxuc, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(jPanel2Layout.createSequentialGroup()
                                     .addComponent(jLabel13)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -775,8 +727,8 @@ public class duan extends javax.swing.JFrame {
                             .addComponent(jLabel10)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)))
+                .addGap(19, 19, 19)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(txt_ngaycl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -785,26 +737,24 @@ public class duan extends javax.swing.JFrame {
                     .addComponent(txt_dien1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel13))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(91, 91, 91))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel17)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel17)
+                    .addComponent(txt_tiepxuc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(72, 72, 72)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel28)
                     .addComponent(cbx_gt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_them1)
                     .addComponent(btn_xoa1)
                     .addComponent(btn_sua1)
-                    .addComponent(btn_exit)))
+                    .addComponent(btn_exit))
+                .addGap(13, 13, 13))
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
                     .addContainerGap()
@@ -1047,282 +997,6 @@ public class duan extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("Thông tin biểu hiện bệnh", jPanel3);
-
-        jLabel2.setFont(new java.awt.Font("Sitka Heading", 3, 24)); // NOI18N
-        jLabel2.setText("Thông tin người tiếp xúc");
-
-        tbl_tx.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Mã tiếp xúc", "Mã cách ly", "Họ tên", "Giới tính", "Ngày sinh", "Địa chỉ ", "Diện"
-            }
-        ));
-        tbl_tx.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tbl_txMouseClicked(evt);
-            }
-        });
-        jScrollPane2.setViewportView(tbl_tx);
-
-        btn_savetx.setText("Thêm");
-        btn_savetx.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_savetxActionPerformed(evt);
-            }
-        });
-
-        btnExit3.setText("Exit");
-        btnExit3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExit3ActionPerformed(evt);
-            }
-        });
-
-        btnSua3.setText("Sửa");
-        btnSua3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSua3ActionPerformed(evt);
-            }
-        });
-
-        btnXoa3.setText("Xóa");
-        btnXoa3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnXoa3ActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setText("Ngày sinh");
-
-        jLabel3.setText("Họ và tên");
-
-        jLabel1.setText("Mã tiếp xúc");
-
-        buttonGroup1.add(rdo_namtx);
-        rdo_namtx.setText("Nam");
-
-        buttonGroup1.add(rdo_nutx);
-        rdo_nutx.setText("Nữ");
-
-        jLabel5.setText("Giới tính");
-
-        jLabel6.setText("Diện");
-
-        jLabel7.setText("Mã cách ly");
-
-        jLabel8.setText("Địa chỉ");
-
-        txt_diachitx.setColumns(20);
-        txt_diachitx.setRows(5);
-        jScrollPane1.setViewportView(txt_diachitx);
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        jLabel31.setText("Tìm mã tiếp xúc");
-
-        txt_tim3.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txt_tim3KeyReleased(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel31)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(txt_tim3)
-                .addContainerGap())
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel31)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_tim3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        jLabel32.setText("Tìm theo diện");
-
-        cbx_timdien3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "F0", "F1", "F2", "F3", "F4", "F5", "None", " " }));
-        cbx_timdien3.setSelectedItem("None");
-        cbx_timdien3.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cbx_timdien3ItemStateChanged(evt);
-            }
-        });
-        cbx_timdien3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbx_timdien3ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel32)
-                .addGap(18, 18, 18)
-                .addComponent(cbx_timdien3, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel32)
-                    .addComponent(cbx_timdien3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        txt_dien2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_dien2ActionPerformed(evt);
-            }
-        });
-
-        jLabel29.setText("Lọc giới tính");
-
-        cbx_gt3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Nam", "Nữ", "None" }));
-        cbx_gt3.setSelectedItem("None");
-        cbx_gt3.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cbx_gt3ItemStateChanged(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(60, 60, 60)
-                                .addComponent(jLabel2)
-                                .addGap(0, 59, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGap(96, 96, 96)
-                                        .addComponent(txt_matx))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel7)
-                                        .addGap(36, 36, 36)
-                                        .addComponent(txt_macl1))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel3)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel6)
-                                            .addComponent(jLabel8))
-                                        .addGap(41, 41, 41)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txt_hotentx)
-                                            .addComponent(jScrollPane1)
-                                            .addComponent(txt_ngaysinhtx)
-                                            .addComponent(txt_dien2)))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel5)
-                                        .addGap(50, 50, 50)
-                                        .addComponent(rdo_namtx)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(rdo_nutx))
-                                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addGap(9, 9, 9))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel29)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cbx_gt3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(btn_savetx, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnXoa3, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnSua3, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnExit3, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1296, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addGap(38, 38, 38)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txt_matx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_macl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txt_hotentx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(rdo_namtx)
-                    .addComponent(rdo_nutx)
-                    .addComponent(jLabel5))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txt_ngaysinhtx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(txt_dien2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel29)
-                    .addComponent(cbx_gt3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_savetx)
-                    .addComponent(btnXoa3)
-                    .addComponent(btnSua3)
-                    .addComponent(btnExit3))
-                .addGap(0, 184, Short.MAX_VALUE))
-            .addComponent(jScrollPane2)
-        );
-
-        jTabbedPane1.addTab("Thông tin người tiếp xúc", jPanel1);
 
         jPanel7.setBackground(new java.awt.Color(51, 255, 51));
 
@@ -1640,7 +1314,7 @@ public class duan extends javax.swing.JFrame {
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 829, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(0, 0, 0))
         );
 
         pack();
@@ -1669,29 +1343,6 @@ public class duan extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Xóa thất bại");
         }
     }//GEN-LAST:event_btn_xoa1ActionPerformed
-
-    private void btnXoa3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoa3ActionPerformed
-        // TODO add your handling code here:
-        int ret = JOptionPane.showConfirmDialog(this, "Do you want to delete?", "Confirm", JOptionPane.YES_NO_OPTION);
-        if (ret != JOptionPane.YES_OPTION) {
-            return;
-        }
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
-            Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "delete from nguoitiepxuc where matiepxuc = ?";
-            PreparedStatement st = con.prepareStatement(sql);
-            st.setString(1, txt_matx.getText());
-            st.execute();
-            JOptionPane.showMessageDialog(this, "Xóa thành công");
-            con.close();
-            filltable1();
-        } catch (Exception ex) {
-            System.out.println(ex);
-            JOptionPane.showMessageDialog(this, "Xóa thất bại");
-        }
-    }//GEN-LAST:event_btnXoa3ActionPerformed
 
     private void btnXoaBenhActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaBenhActionPerformed
         // TODO add your handling code here:
@@ -1732,7 +1383,7 @@ public class duan extends javax.swing.JFrame {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "insert into NguoiCachLi(  MaCachLi ,Ten,GioiTinh,ngsinh,Sdt,DiaChi,NgayCachLi,Dien,GhiChu) values(?,?,?,?,?,?,?,?,?)";
+            String sql = "insert into NguoiCachLi(  MaCachLi ,Ten,GioiTinh,ngsinh,Sdt,DiaChi,NgayCachLi,Dien,tiepxuc) values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement st = con.prepareStatement(sql);
             st.setString(1, txt_macl.getText());
             st.setString(2, txt_hoten.getText());
@@ -1748,7 +1399,7 @@ public class duan extends javax.swing.JFrame {
             st.setString(6, txt_diachi.getText());
             st.setString(7, txt_ngaycl.getText());
             st.setString(8, txt_dien1.getText());
-            st.setString(9, txt_ghichu.getText());
+            st.setString(9, txt_tiepxuc.getText());
             st.execute();
             JOptionPane.showMessageDialog(this, "Nhập thành công");
             filltable();
@@ -1773,7 +1424,7 @@ public class duan extends javax.swing.JFrame {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 String sql = "Update NguoiCachLi set Ten =?,GioiTinh = ?,ngsinh =?,Sdt = ?,"
-                        + "DiaChi = ? ,NgayCachLi = ?,Dien = ?,GhiChu = ?"
+                        + "DiaChi = ? ,NgayCachLi = ?,Dien = ?,tiepxuc = ?"
                         + " where  MaCachLi = ?";
                 PreparedStatement st = con.prepareStatement(sql);
                 st.setString(9, txt_macl.getText());
@@ -1790,21 +1441,21 @@ public class duan extends javax.swing.JFrame {
                 st.setString(5, txt_diachi.getText());
                 st.setString(6, txt_ngaycl.getText());
                 st.setString(7, txt_dien1.getText());
-                st.setString(8, txt_ghichu.getText());
+                st.setString(8, txt_tiepxuc.getText());
                 st.executeUpdate();
                 dtm.setRowCount(0);
                 JOptionPane.showMessageDialog(this, "Update thành công");
                 filltable();
 
                 //f2->f1->f0
-                sql = "Select *from nguoitiepxuc where macachli = ? ";
+                sql = "Select *from nguoicachli where tiepxuc = ? ";
                 st = con.prepareStatement(sql);
                 st.setString(1, txt_macl.getText());
                 ResultSet rs = st.executeQuery();
                 List<tmpNTX> listTX = new ArrayList<>();
                 while (rs.next()) {
                     tmpNTX tX = new tmpNTX();
-                    tX.setMTX(rs.getString("MaTiepXuc"));
+                    tX.setMTX(rs.getString("macachli"));
                     tX.setDien(rs.getString("Dien"));
                     listTX.add(tX);
                 }
@@ -1820,7 +1471,7 @@ public class duan extends javax.swing.JFrame {
                 } 
 
                 for (tmpNTX tmp : listTX) {
-                    sql = "update nguoitiepxuc set nguoitiepxuc.dien = ? where macachli = ? and MaTiepXuc = ?";
+                    sql = "update nguoicachli set dien = ? where tiepxuc = ? and macachli = ?";
                     st = con.prepareStatement(sql);
                     st.setString(1, tmp.getDien());
                     st.setString(2, txt_macl.getText());
@@ -1830,7 +1481,7 @@ public class duan extends javax.swing.JFrame {
                 for(int i = 0 ; i<listTX.size();i++){
                     listTX.remove(i);
                 }
-
+                filltable();
                 filltable2();
                 con.close();
             }
@@ -1869,114 +1520,13 @@ public class duan extends javax.swing.JFrame {
         locdata(boloc1);
     }//GEN-LAST:event_cbx_gtItemStateChanged
 
-    private void txt_tim3KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_tim3KeyReleased
-        // TODO add your handling code here:
-        String tim = txt_tim3.getText();
-        TableRowSorter tb = new TableRowSorter(dtm1);
-        tbl_tx.setRowSorter(tb);
-        tb.setRowFilter(RowFilter.regexFilter(tim, 0));
-        fillcontrol1(index);
-    }//GEN-LAST:event_txt_tim3KeyReleased
-
-    private void cbx_timdien3ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbx_timdien3ItemStateChanged
-        // TODO add your handling code here:
-        String boloc = cbx_timdien3.getSelectedItem().toString();
-        locdataTX(boloc);
-    }//GEN-LAST:event_cbx_timdien3ItemStateChanged
-
-    private void txt_dien2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_dien2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_dien2ActionPerformed
-
     private void txt_dien3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_dien3ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_dien3ActionPerformed
 
-    private void tbl_txMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_txMouseClicked
-        // TODO add your handling code here:
-        index = tbl_tx.getSelectedRow();
-        fillcontrol1(index);
-    }//GEN-LAST:event_tbl_txMouseClicked
-
     private void tbl_tx1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_tx1MouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_tbl_tx1MouseClicked
-
-    private void btn_savetxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_savetxActionPerformed
-        // TODO add your handling code here:
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "insert into nguoitiepxuc(matiepxuc,macachli,ten,gioitinh,ngsinh,diachi,dien) values(?,?,?,?,?,?,?)";
-            PreparedStatement st = con.prepareStatement(sql);
-            st.setString(1, txt_matx.getText());
-            st.setString(2, txt_macl1.getText());
-            st.setString(3, txt_hotentx.getText());
-            boolean gt;
-            if (rdo_namtx.isSelected() == true) {
-                gt = true;
-            } else {
-                gt = false;
-            }
-            st.setBoolean(4, gt);
-            st.setString(5, txt_ngaysinhtx.getText());
-            st.setString(6, txt_diachitx.getText());
-            st.setString(7, txt_dien2.getText());
-            st.execute();
-            JOptionPane.showMessageDialog(this, "Nhập thành công");
-            filltable1();
-        } catch (Exception ex) {
-            System.out.println(ex);
-            JOptionPane.showMessageDialog(this, "Nhập thất bại");
-        }
-    }//GEN-LAST:event_btn_savetxActionPerformed
-
-    private void cbx_timdien3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_timdien3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbx_timdien3ActionPerformed
-
-    private void cbx_gt3ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbx_gt3ItemStateChanged
-        // TODO add your handling code here:;
-        String boloc3 = cbx_gt3.getSelectedItem().toString();
-        locdataTX(boloc3);
-    }//GEN-LAST:event_cbx_gt3ItemStateChanged
-
-    private void btnExit3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExit3ActionPerformed
-        // TODO add your handling code here:
-        System.exit(0);
-    }//GEN-LAST:event_btnExit3ActionPerformed
-
-    private void btnSua3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSua3ActionPerformed
-        // TODO add your handling code here:
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "Update nguoitiepxuc set macachli = ?,ten =?,gioitinh = ?,"
-                    + "ngsinh = ? ,diachi = ?,Dien = ? where matiepxuc =?";
-            PreparedStatement st = con.prepareStatement(sql);
-            st.setString(7, txt_matx.getText());
-            st.setString(1, txt_macl1.getText());
-            st.setString(2, txt_hotentx.getText());
-            boolean gt;
-            if (rdonam.isSelected()) {
-                gt = true;
-            } else {
-                gt = false;
-            }
-            st.setBoolean(3, gt);
-            st.setString(4, txt_ngaysinhtx.getText());
-            st.setString(5, txt_diachitx.getText());
-            st.setString(6, txt_dien2.getText());
-            st.executeUpdate();
-            dtm.setRowCount(0);
-            JOptionPane.showMessageDialog(this, "Update thành công");
-            filltable();
-            con.close();
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        filltable1();
-    }//GEN-LAST:event_btnSua3ActionPerformed
 
     private void tbl_benhMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_benhMouseClicked
         // TODO add your handling code here:
@@ -2051,14 +1601,15 @@ public class duan extends javax.swing.JFrame {
 
     private void tbl_nhanvienMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_nhanvienMouseClicked
         // TODO add your handling code here:
+        lblImgNv.setIcon(null);
         index = tbl_nhanvien.getSelectedRow();
         fillcontrolNhanVien(index);
         try {
             fillImageNvien(index);
         } catch (SQLException ex) {
-            Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
+            lblImgNv.setEnabled(false);
         } catch (IOException ex) {
-            Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
+            lblImgNv.setEnabled(false);
         }
     }//GEN-LAST:event_tbl_nhanvienMouseClicked
 
@@ -2257,6 +1808,10 @@ public class duan extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void txt_tiepxucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_tiepxucActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_tiepxucActionPerformed
     public void locdata(String boloc) {
         TableRowSorter<DefaultTableModel> sx = new TableRowSorter<DefaultTableModel>(dtm);
         tbl_ncl.setRowSorter(sx);
@@ -2266,15 +1821,7 @@ public class duan extends javax.swing.JFrame {
             tbl_ncl.setRowSorter(sx);
         }
     }
-    public void locdataTX(String boloc3) {
-        TableRowSorter<DefaultTableModel> sx3 = new TableRowSorter<DefaultTableModel>(dtm1);
-        tbl_tx.setRowSorter(sx3);
-        if (boloc3 != "None") {
-            sx3.setRowFilter(RowFilter.regexFilter(boloc3));
-        } else {
-            tbl_tx.setRowSorter(sx3);
-        }
-    }
+
     
     public void locdataBenh(String boloc3) {
         TableRowSorter<DefaultTableModel> sx = new TableRowSorter<DefaultTableModel>(dtm3);
@@ -2313,7 +1860,7 @@ public class duan extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new duan(null, null).setVisible(true);
+                    new duan("admin", null).setVisible(true);
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(duan.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
@@ -2325,32 +1872,25 @@ public class duan extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditImg;
-    private javax.swing.JButton btnExit3;
     private javax.swing.JButton btnExit4;
-    private javax.swing.JButton btnSua3;
     private javax.swing.JButton btnSua4;
     private javax.swing.JButton btnSuaBenh;
     private javax.swing.JButton btnThemBenh;
-    private javax.swing.JButton btnXoa3;
     private javax.swing.JButton btnXoa4;
     private javax.swing.JButton btnXoaBenh;
     private javax.swing.JButton btn_exit;
-    private javax.swing.JButton btn_savetx;
     private javax.swing.JButton btn_savetx1;
     private javax.swing.JButton btn_sua1;
     private javax.swing.JButton btn_them1;
     private javax.swing.JButton btn_xoa1;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cbx_gt;
-    private javax.swing.JComboBox<String> cbx_gt3;
     private javax.swing.JComboBox<String> cbx_gtNv;
     private javax.swing.JComboBox<String> cbx_timdien;
-    private javax.swing.JComboBox<String> cbx_timdien3;
     private javax.swing.JComboBox<String> cbx_timdienBenh;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton19;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -2361,7 +1901,6 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -2371,11 +1910,7 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
@@ -2383,17 +1918,11 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
     private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -2403,22 +1932,15 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblImgNv;
-    private javax.swing.JRadioButton rdo_namtx;
-    private javax.swing.JRadioButton rdo_nutx;
     private javax.swing.JRadioButton rdonam;
     private javax.swing.JRadioButton rdonamNv;
     private javax.swing.JRadioButton rdonu;
@@ -2426,34 +1948,26 @@ public class duan extends javax.swing.JFrame {
     private javax.swing.JTable tbl_benh;
     private javax.swing.JTable tbl_ncl;
     private javax.swing.JTable tbl_nhanvien;
-    private javax.swing.JTable tbl_tx;
     private javax.swing.JTable tbl_tx1;
     private javax.swing.JTextArea txt_bieuhien3;
     private javax.swing.JTextArea txt_diachi;
-    private javax.swing.JTextArea txt_diachitx;
     private javax.swing.JTextField txt_dien1;
-    private javax.swing.JTextField txt_dien2;
     private javax.swing.JTextField txt_dien3;
-    private javax.swing.JTextArea txt_ghichu;
     private javax.swing.JTextArea txt_ghichu3;
     private javax.swing.JTextField txt_hoten;
-    private javax.swing.JTextField txt_hotentx;
     private javax.swing.JTextField txt_macl;
-    private javax.swing.JTextField txt_macl1;
     private javax.swing.JTextField txt_macl3;
     private javax.swing.JTextField txt_manvien;
-    private javax.swing.JTextField txt_matx;
     private javax.swing.JTextField txt_ngaycl;
     private javax.swing.JTextField txt_ngaycl3;
     private javax.swing.JTextField txt_ngaysinh;
-    private javax.swing.JTextField txt_ngaysinhtx;
     private javax.swing.JTextField txt_ngsinhNv;
     private javax.swing.JTextField txt_roleNvien;
     private javax.swing.JTextField txt_sdt1;
     private javax.swing.JTextField txt_sdtNv;
     private javax.swing.JTextField txt_tenNvien;
+    private javax.swing.JTextField txt_tiepxuc;
     private javax.swing.JTextField txt_tim;
-    private javax.swing.JTextField txt_tim3;
     private javax.swing.JTextField txt_timBenh;
     private javax.swing.JTextField txt_timNv;
     // End of variables declaration//GEN-END:variables

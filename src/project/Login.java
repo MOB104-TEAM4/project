@@ -255,7 +255,7 @@ public class Login extends javax.swing.JFrame {
             try {
                 String user = "sa";
                 String pass = "123";
-                String url = "jdbc:sqlserver://localhost:1433;database=project;";
+                String url = "jdbc:sqlserver://localhost:1433;database=project1;";
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 String sql = "select * from NhanVien";
