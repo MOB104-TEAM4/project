@@ -1119,7 +1119,31 @@ public class NguoiCachLy extends javax.swing.JFrame {
             char tmpDien1Char = tmpDien1.charAt(1);
             int InttmpDien1 = Integer.parseInt(String.valueOf(tmpDien1Char));
             if (InttmpDien == InttmpDien1 || InttmpDien<0 ) {
-                JOptionPane.showMessageDialog(this, "Sua khong thanh cong");
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = DriverManager.getConnection(url, user, pass);
+                String sql = "Update NguoiCachLi set Ten =?,GioiTinh = ?,ngsinh =?,Sdt = ?,"
+                        + "DiaChi = ? ,NgayCachLi = ?,Dien = ?,tiepxuc = ?"
+                        + " where  MaCachLi = ?";
+                PreparedStatement st = con.prepareStatement(sql);
+                st.setString(9, txtMcl.getText());
+                st.setString(1, txtTen.getText());
+                boolean gt;
+                if (rdoNam.isSelected()) {
+                    gt = true;
+                } else {
+                    gt = false;
+                }
+                st.setBoolean(2, gt);
+                st.setString(3, txtNgsinh.getText());
+                st.setString(4, txtSdt.getText());
+                st.setString(5, txtDchi.getText());
+                st.setString(6, txtNgaycl.getText());
+                st.setString(7, txtDien.getText());
+                st.setString(8, txtTX.getText());
+                st.executeUpdate();
+                dtm.setRowCount(0);
+                JOptionPane.showMessageDialog(this, "Update thành công");
+                filltable();
             } else {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 Connection con = DriverManager.getConnection(url, user, pass);

@@ -831,14 +831,14 @@ public class BenhAn extends javax.swing.JFrame {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "Update Benh set ngay =?,dien = ?,"
-                    + "bieuhien = ? ,ghichu = ? where macachli = ?";
+            String sql = "Update Benh set dien = ?,"
+                    + "bieuhien = ? ,ghichu = ? where macachli = ? and ngay = ?";
             PreparedStatement st = con.prepareStatement(sql);
-            st.setString(5, txtMcl.getText());
-            st.setString(1, txtNgaycl.getText());
-            st.setString(2, txtDien.getText());
-            st.setString(3, txtBhien.getText());
-            st.setString(4, txtGhichu.getText());
+            st.setString(4, txtMcl.getText());
+            st.setString(5, txtNgaycl.getText());
+            st.setString(1, txtDien.getText());
+            st.setString(2, txtBhien.getText());
+            st.setString(3, txtGhichu.getText());
             st.executeUpdate();
             dtm.setRowCount(0);
             JOptionPane.showMessageDialog(this, "Update thành công");
@@ -860,9 +860,10 @@ public class BenhAn extends javax.swing.JFrame {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
             Connection con = DriverManager.getConnection(url, user, pass);
-            String sql = "delete from benh where MaCachLi = ?";
+            String sql = "delete from benh where MaCachLi = ? and ngay = ?";
             PreparedStatement st = con.prepareStatement(sql);
             st.setString(1, txtMcl.getText());
+            st.setString(2, txtNgaycl.getText());
             st.execute();
             JOptionPane.showMessageDialog(this, "Xóa thành công");
             con.close();
