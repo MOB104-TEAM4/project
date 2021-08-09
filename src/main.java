@@ -1,4 +1,5 @@
 
+
 import modelTmp.User;
 
 /*
@@ -13,8 +14,13 @@ import modelTmp.User;
  */
 public class main {
     public static User userTmp = new User();
+    public static final String user = "sa";
+    public static final String pass = "123";
+    public static ThongKe tk = new ThongKe();
+    public static final String url = "jdbc:sqlserver://localhost:1433;database=project1;";
     public static void main(String[] args) {
-        Login login = new Login();
-        login.setVisible(true);
+        Loading ld = new Loading();
+        ld.setVisible(true);
+        
     }
 }

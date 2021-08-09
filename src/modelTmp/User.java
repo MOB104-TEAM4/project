@@ -14,6 +14,7 @@ public class User {
     private String name;
     private String roler;
     private String username ;
+    private byte [] dataImg;
     public User(){
         
     }
@@ -59,6 +60,20 @@ public class User {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     * @return the dataImg
+     */
+    public byte[] getDataImg() {
+        return dataImg;
+    }
+
+    /**
+     * @param dataImg the dataImg to set
+     */
+    public void setDataImg(byte[] dataImg) {
+        this.dataImg = dataImg;
     }
     
     
